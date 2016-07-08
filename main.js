@@ -18,7 +18,7 @@ function createWindow () {
   const initPath = path.join(app.getPath('userData'), 'init.json')
 
   // Load window bounds data.
-  let data
+  let data = {}
 
   try {
     data = JSON.parse(fs.readFileSync(initPath, 'utf8'))
