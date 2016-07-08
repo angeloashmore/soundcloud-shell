@@ -1,0 +1,8 @@
+# Node dependencies
+node_modules
+
+# Packaged app
+release
+
+# macOS
+.DS_Store
