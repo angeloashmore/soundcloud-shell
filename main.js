@@ -1,5 +1,6 @@
 const electron = require('electron')
-const windowStateKeeper = require('electron-window-state')
+const path = require('path')
+const fs = require('fs')
 const sendKeyPressJS = require('./lib/sendKeyPressJS')
 // Module to control application life.
 const app = electron.app
@@ -13,28 +14,31 @@ const globalShortcut = electron.globalShortcut
 let mainWindow
 
 function createWindow () {
-  // Create the browser window state.
-  const mainWindowState = windowStateKeeper({
-    defaultHeight: 1240,
-    defaultWidth: 900
-  })
+  // Path to store window bounds data.
+  const initPath = path.join(app.getPath('userData'), 'init.json')
+
+  // Load window bounds data.
+  let data
+
+  try {
+    data = JSON.parse(fs.readFileSync(initPath, 'utf8'))
+  } catch (e) {
+    // Ignore
+  }
 
   // Create the browser window.
-  mainWindow = new BrowserWindow({
-    frame: false,
-    height: mainWindowState.height,
-    width: mainWindowState.width,
-    x: mainWindowState.x,
-    y: mainWindowState.y
-  })
-
-  // Allow the browser window state keeper to manage the window.
-  mainWindowState.manage(mainWindow)
+  mainWindow = new BrowserWindow(
+    Object.assign({}, {
+      frame: false,
+      height: 900,
+      width: 1240
+    }, data.bounds)
+  )
 
   // And load the index.html of the app.
   mainWindow.loadURL('https://soundcloud.com/')
 
-  // Retrieve the window's webContents
+  // Retrieve the window's webContents.
   const webContents = mainWindow.webContents
 
   // Setup keyboard shortcuts
@@ -51,6 +55,16 @@ function createWindow () {
   globalShortcut.register('Control+Q', () => {
     // Previous song
     webContents.executeJavaScript(sendKeyPressJS(37, true))
+  })
+
+  // Emitted before the window is closed.
+  mainWindow.on('close', function () {
+    // Get the window's bounds and save it.
+    const data = {
+      bounds: mainWindow.getBounds()
+    }
+
+    fs.writeFileSync(initPath, JSON.stringify(data))
   })
 
   // Emitted when the window is closed.
