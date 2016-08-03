@@ -8,10 +8,15 @@ const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 // Module to register global keyboard shortcuts.
 const globalShortcut = electron.globalShortcut
+// Module to interact with external handlers
+const shell = electron.shell
+// Module to set the native menu.
+const Menu = electron.Menu
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
+let template
 
 function createWindow () {
   // Path to store window bounds data.
@@ -74,6 +79,87 @@ function createWindow () {
     // when you should delete the corresponding element.
     mainWindow = null
   })
+
+  template = [{
+    label: 'SoundCloud Shell',
+    submenu: [{
+      label: 'About SoundCloud Shell',
+      selector: 'orderFrontStandardAboutPanel:'
+    }, {
+      type: 'separator'
+    }, {
+      label: 'Services',
+      submenu: []
+    }, {
+      type: 'separator'
+    }, {
+      label: 'Hide SoundCloud Shell',
+      accelerator: 'Command+H',
+      selector: 'hide:'
+    }, {
+      label: 'Hide Others',
+      accelerator: 'Alt+Command+H',
+      selector: 'hideOtherApplications:'
+    }, {
+      label: 'Show All',
+      selector: 'unhideAllApplications:'
+    }, {
+      type: 'separator'
+    }, {
+      label: 'Quit',
+      accelerator: 'Command+Q',
+      click () {
+        app.quit()
+      }
+    }]
+  }, {
+    label: 'View',
+    submenu: [{
+      label: 'Reload',
+      accelerator: 'Command+R',
+      click () {
+        mainWindow.webContents.reload()
+      }
+    }, {
+      label: 'Toggle Full Screen',
+      accelerator: 'Ctrl+Command+F',
+      click () {
+        mainWindow.setFullScreen(!mainWindow.isFullScreen())
+      }
+    }]
+  }, {
+    label: 'Window',
+    submenu: [{
+      label: 'Minimize',
+      accelerator: 'Command+M',
+      selector: 'performMiniaturize:'
+    }, {
+      label: 'Close',
+      accelerator: 'Command+W',
+      selector: 'performClose:'
+    }, {
+      type: 'separator'
+    }, {
+      label: 'Bring All to Front',
+      selector: 'arrangeInFront:'
+    }]
+  }, {
+    label: 'Help',
+    submenu: [{
+      label: 'Learn More',
+      click () {
+        shell.openExternal('http://github.com/angeloashmore/soundcloud-shell')
+      }
+    }, {
+      label: 'Search Issues',
+      click () {
+        shell.openExternal('https://github.com/angeloashmore/soundcloud-shell/issues')
+      }
+    }]
+  }]
+
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
 }
 
 // This method will be called when Electron has finished
