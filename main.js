@@ -47,17 +47,17 @@ function createWindow () {
   const webContents = mainWindow.webContents
 
   // Setup keyboard shortcuts
-  globalShortcut.register('Control+E', () => {
+  globalShortcut.register('Shift+Control+E', () => {
     // Pause song
     webContents.executeJavaScript(sendKeyPressJS(32))
   })
 
-  globalShortcut.register('Control+W', () => {
+  globalShortcut.register('Shift+Control+W', () => {
     // Next song
     webContents.executeJavaScript(sendKeyPressJS(39, true))
   })
 
-  globalShortcut.register('Control+Q', () => {
+  globalShortcut.register('Shift+Control+Q', () => {
     // Previous song
     webContents.executeJavaScript(sendKeyPressJS(37, true))
   })
